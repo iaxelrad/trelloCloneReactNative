@@ -12,3 +12,12 @@ web-build/
 
 # macOS
 .DS_Store
+
+.vscode/
+
+ios/
+android/
+
+expo-env.d.ts
+# @end expo-cli
+.env
