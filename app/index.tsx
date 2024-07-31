@@ -11,7 +11,6 @@ import {
 } from '@gorhom/bottom-sheet';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import AuthModal from '@/components/AuthModal';
-import { red } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 export default function Index() {
   const { top } = useSafeAreaInsets();
@@ -28,7 +27,6 @@ export default function Index() {
   const openActionSheet = async () => {
     const options = ['View support docs', 'Contact us', 'Cancel'];
     const cancelButtonIndex = 2;
-
     showActionSheetWithOptions(
       {
         options,
