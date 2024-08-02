@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import BoardArea from '@/components/Board/BoardArea';
 
 const Page = () => {
   const { id, bg } = useLocalSearchParams<{ id: string; bg?: string }>();
@@ -25,7 +26,6 @@ const Page = () => {
 
   const loadBoardInfo = async () => {
     const data = await getBoardInfo!(id);
-    console.log('data', data);
     setBoard(data);
   };
 
@@ -81,7 +81,7 @@ const Page = () => {
           header: CustomHeader,
         }}
       />
-      <Text>Boards carousel</Text>
+      {board && <BoardArea board={board} />}
     </View>
   );
 };

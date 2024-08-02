@@ -20,7 +20,6 @@ const Page = () => {
   const { createBoard } = useSupabase();
 
   useEffect(() => {
-    console.log('BG', bg);
     if (bg) {
       setSelectedColor(bg);
     }

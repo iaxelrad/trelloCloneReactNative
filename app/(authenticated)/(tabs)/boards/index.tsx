@@ -24,9 +24,7 @@ const Page = () => {
   );
 
   const loadBoards = async () => {
-    console.log('loading Boards');
     const data = await getBoards!();
-    console.log('data', data);
     setBoards(data);
   };
 

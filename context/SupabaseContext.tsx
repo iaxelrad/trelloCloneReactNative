@@ -72,7 +72,6 @@ export const SupabaseProvider = ({ children }: any) => {
     const clerkToken = await window.Clerk?.session?.getToken({
       template: 'supabase',
     });
-    // console.log('clerkToken', clerkToken);
 
     client.realtime.setAuth(clerkToken!);
   };
