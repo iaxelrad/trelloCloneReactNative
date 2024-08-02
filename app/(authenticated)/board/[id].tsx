@@ -58,7 +58,7 @@ const Page = () => {
               color={Colors.fontLight}
             />
           </TouchableOpacity>
-          <Link href="/" asChild>
+          <Link href={`/(authenticated)/board/settings?id=${id}`} asChild>
             <TouchableOpacity>
               <MaterialCommunityIcons
                 name="dots-horizontal"

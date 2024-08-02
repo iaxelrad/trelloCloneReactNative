@@ -53,6 +53,10 @@ const BoardArea = ({ board }: BoardAreaProps) => {
     ref.current?.scrollTo({ count: index - progress.value, animated: true });
   };
 
+  const onListDeleted = (id: string) => {
+    setData(data.filter(item => item.id !== id));
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <Carousel
@@ -65,7 +69,13 @@ const BoardArea = ({ board }: BoardAreaProps) => {
         onProgressChange={progress}
         renderItem={({ item, index }: any) => (
           <>
-            {item.id && <ListView taskList={item} key={index} />}
+            {item.id && (
+              <ListView
+                taskList={item}
+                key={index}
+                onDelete={() => onListDeleted(item.id)}
+              />
+            )}
             {item.id === undefined && (
               <View
                 key={index}
