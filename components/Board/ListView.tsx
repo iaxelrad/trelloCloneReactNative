@@ -28,6 +28,7 @@ import DraggableFlatList, {
 } from 'react-native-draggable-flatlist';
 import * as Haptics from 'expo-haptics';
 import ListItem from './ListItem';
+import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 export interface ListViewProps {
   taskList: TaskList;
@@ -47,15 +48,62 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
     getListCards,
     addListCard,
     updateCard,
+    getRealtimeCardSubscription,
   } = useSupabase();
 
   useEffect(() => {
     loadListTasks();
+    const subscription = getRealtimeCardSubscription!(
+      taskList.id,
+      handleRealtimeChanges
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const handleRealtimeChanges = (
+    update: RealtimePostgresChangesPayload<any>
+  ) => {
+    console.log('REALTIME UPDATE:', update);
+    const record = update.new?.id ? update.new : update.old;
+    const event = update.eventType;
+
+    if (!record) return;
+
+    switch (event) {
+      case 'INSERT':
+        setTasks(prev => {
+          return [...prev, record];
+        });
+        break;
+      case 'UPDATE':
+        setTasks(prev => {
+          return prev
+            .map(task => {
+              if (task.id === record.id) {
+                return record;
+              }
+              return task;
+            })
+            .filter(task => !task.done)
+            .sort((a, b) => a.position - b.position);
+        });
+        break;
+      case 'DELETE':
+        setTasks(prev => {
+          return prev.filter(task => task.id !== record.id);
+        });
+        break;
+      default:
+        console.log('Unhandled event type: ', event);
+        break;
+    }
+  };
 
   const loadListTasks = async () => {
     const cards = await getListCards!(taskList.id);
-    console.log(cards);
     setTasks(cards);
   };
 
@@ -68,7 +116,7 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
     );
     setIsAdding(false);
     setNewTask('');
-    setTasks([...tasks, data]);
+    // setTasks([...tasks, data]);
   };
 
   const renderBackdrop = useCallback(
@@ -129,7 +177,11 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
             data={tasks}
             keyExtractor={item => item.id}
             renderItem={ListItem}
-            contentContainerStyle={{ gap: 4, maxHeight: '80%' }}
+            containerStyle={{
+              paddingBottom: 4,
+              maxHeight: '80%',
+            }}
+            contentContainerStyle={{ gap: 4 }}
             onDragEnd={onTaskDropped}
             onDragBegin={() =>
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
