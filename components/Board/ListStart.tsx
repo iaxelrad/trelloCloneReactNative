@@ -8,13 +8,14 @@ import {
 import React, { useState } from 'react';
 import { Colors } from '@/constants/Colors';
 
-interface ListStartProps {
+export interface ListStartProps {
   onCancel: () => void;
   onSave: (title: string) => void;
 }
 
 const ListStart = ({ onCancel, onSave }: ListStartProps) => {
   const [listTitle, setListTitle] = useState('');
+
   return (
     <View style={styles.card}>
       <TextInput
@@ -60,5 +61,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
-
 export default ListStart;

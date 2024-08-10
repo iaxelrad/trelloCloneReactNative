@@ -69,7 +69,7 @@ export const SupabaseProvider = ({ children }: any) => {
   }, []);
 
   const setRealtimeAuth = async () => {
-    const clerkToken = await window.Clerk?.session?.getToken({
+    const clerkToken = await window.Clerk.session?.getToken({
       template: 'supabase',
     });
 

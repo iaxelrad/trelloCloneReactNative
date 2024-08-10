@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 const ListItem = ({ item, drag, isActive }: RenderItemParams<Task>) => {
   const router = useRouter();
   const { getFileFromPath } = useSupabase();
-  const [imagePath, setImagePath] = useState<string>();
+  const [imagePath, setImagePath] = useState<string>('');
 
   if (item.image_url) {
     getFileFromPath!(item.image_url).then(path => {
@@ -32,13 +32,14 @@ const ListItem = ({ item, drag, isActive }: RenderItemParams<Task>) => {
         onLongPress={drag}
         onPress={openLink}
         disabled={isActive}
+        activeOpacity={1}
         style={[styles.rowItem, { opacity: isActive ? 0.5 : 1 }]}
       >
         {!item.image_url ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ flex: 1 }}>{item.title}</Text>
             {item.assigned_to && (
-              <Ionicons name="person-circle-outline" size={16} color="black" />
+              <Ionicons name="person-circle-outline" size={16} color={'#000'} />
             )}
           </View>
         ) : (
@@ -50,7 +51,7 @@ const ListItem = ({ item, drag, isActive }: RenderItemParams<Task>) => {
                   width: '100%',
                   height: 200,
                   borderRadius: 4,
-                  backgroundColor: '#fff',
+                  backgroundColor: '#f3f3f3',
                 }}
               />
             )}
@@ -60,7 +61,7 @@ const ListItem = ({ item, drag, isActive }: RenderItemParams<Task>) => {
                 <Ionicons
                   name="person-circle-outline"
                   size={16}
-                  color="black"
+                  color={'#000'}
                 />
               )}
             </View>
@@ -71,8 +72,6 @@ const ListItem = ({ item, drag, isActive }: RenderItemParams<Task>) => {
   );
 };
 
-export default ListItem;
-
 const styles = StyleSheet.create({
   rowItem: {
     padding: 8,
@@ -80,3 +79,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
+
+export default ListItem;

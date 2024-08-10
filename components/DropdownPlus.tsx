@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import React from 'react';
 import * as DropdownMenu from 'zeego/dropdown-menu';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,11 +6,12 @@ import { useRouter } from 'expo-router';
 
 const DropdownPlus = () => {
   const router = useRouter();
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         <TouchableOpacity>
-          <Ionicons name="add" size={32} color="white" />
+          <Ionicons name="add" size={32} color={'#fff'} />
         </TouchableOpacity>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
@@ -18,7 +19,7 @@ const DropdownPlus = () => {
           <DropdownMenu.Item
             key="board"
             onSelect={() =>
-              router.push('/(authenticated)/(tabs)/boards/new-board')
+              router.push('(authenticated)/(tabs)/boards/new-board')
             }
           >
             <DropdownMenu.ItemTitle>Create a board</DropdownMenu.ItemTitle>
@@ -42,16 +43,20 @@ const DropdownPlus = () => {
         <DropdownMenu.Item
           key="templates"
           onSelect={() =>
-            router.push('/(authenticated)/(tabs)/boards/templates')
+            router.push('(authenticated)/(tabs)/boards/templates')
           }
         >
           <DropdownMenu.ItemTitle>Browse Templates</DropdownMenu.ItemTitle>
+          <DropdownMenu.ItemIcon
+            ios={{
+              name: 'square.on.square.dashed',
+              pointSize: 24,
+            }}
+          />
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default DropdownPlus;

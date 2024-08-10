@@ -14,7 +14,7 @@ import { useSupabase } from '@/context/SupabaseContext';
 
 const Page = () => {
   const [boardName, setBoardName] = useState('');
-  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
+  const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_COLOR);
   const router = useRouter();
   const { bg } = useGlobalSearchParams<{ bg?: string }>();
   const { createBoard } = useSupabase();
@@ -76,8 +76,6 @@ const Page = () => {
   );
 };
 
-export default Page;
-
 const styles = StyleSheet.create({
   btnText: {
     fontSize: 18,
@@ -104,7 +102,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     backgroundColor: '#fff',
-    gap: 4,
   },
   btnItemText: {
     fontSize: 16,
@@ -116,3 +113,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
+
+export default Page;

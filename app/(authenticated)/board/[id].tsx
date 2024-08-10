@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useSupabase } from '@/context/SupabaseContext';
@@ -16,7 +16,6 @@ const Page = () => {
   const [board, setBoard] = useState<Board>();
   const { top } = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +24,8 @@ const Page = () => {
   }, [id]);
 
   const loadBoardInfo = async () => {
+    if (!id) return;
+
     const data = await getBoardInfo!(id);
     setBoard(data);
   };
@@ -32,7 +33,7 @@ const Page = () => {
   const CustomHeader = () => (
     <BlurView intensity={80} tint={'dark'} style={{ paddingTop: top }}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.dismiss()}>
           <Ionicons name="close" size={24} color={Colors.fontLight} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
@@ -40,10 +41,10 @@ const Page = () => {
             {board?.title}
           </Text>
           <Text style={{ color: Colors.fontLight, fontSize: 12 }}>
-            Workspace of {board?.users?.first_name}
+            Workspace of {(board as any)?.users.first_name}
           </Text>
         </View>
-        <View style={{ flexDirection: 'row', gap: 14 }}>
+        <View style={{ flexDirection: 'row', gap: 16 }}>
           <TouchableOpacity>
             <Ionicons
               name="filter-circle-outline"
@@ -78,15 +79,13 @@ const Page = () => {
         options={{
           title: board?.title,
           headerTransparent: true,
-          header: CustomHeader,
+          header: () => <CustomHeader />,
         }}
       />
       {board && <BoardArea board={board} />}
     </View>
   );
 };
-
-export default Page;
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -97,3 +96,5 @@ const styles = StyleSheet.create({
     height: 50,
   },
 });
+
+export default Page;

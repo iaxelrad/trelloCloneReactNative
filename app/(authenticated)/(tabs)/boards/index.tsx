@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSupabase } from '@/context/SupabaseContext';
 import { Board } from '@/types/enums';
-import { Link, useFocusEffect } from 'expo-router';
+import { Link, Stack, useFocusEffect } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import DropdownPlus from '@/components/DropdownPlus';
 
 const Page = () => {
   const { getBoards } = useSupabase();
@@ -41,18 +42,22 @@ const Page = () => {
         <View
           style={[styles.colorBlock, { backgroundColor: item.background }]}
         />
-        <View style={[]}>
-          <Text style={{ fontSize: 16 }}>{item.title}</Text>
-        </View>
+        <Text style={{ fontSize: 16 }}>{item.title}</Text>
       </TouchableOpacity>
     </Link>
   );
 
   return (
     <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerRight: () => <DropdownPlus />,
+        }}
+      />
       <FlatList
         data={boards}
-        contentContainerStyle={!!boards.length && styles.list}
+        contentContainerStyle={boards.length > 0 && styles.list}
+        keyExtractor={item => item.id}
         renderItem={ListItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
   },
   list: {
     borderColor: Colors.grey,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: StyleSheet.hairlineWidth,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   listItem: {

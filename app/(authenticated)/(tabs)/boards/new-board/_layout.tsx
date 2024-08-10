@@ -17,7 +17,6 @@ const Layout = () => {
           headerStyle: {
             backgroundColor: DefaultTheme.colors.background,
           },
-          headerTitleAlign: 'center',
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="close" size={26} color={Colors.primary} />

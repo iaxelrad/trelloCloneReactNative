@@ -28,10 +28,12 @@ const Page = () => {
   }, [id]);
 
   const loadInfo = async () => {
-    const data = await getBoardInfo!(id!);
+    if (!id) return;
+
+    const data = await getBoardInfo!(id);
     setBoard(data);
 
-    const member = await getBoardMember!(id!);
+    const member = await getBoardMember!(id);
     setMember(member);
   };
 
@@ -48,15 +50,17 @@ const Page = () => {
   return (
     <View>
       <View style={styles.container}>
-        <Text style={styles.label}>Board name</Text>
-        <TextInput
-          value={board?.title}
-          onChangeText={text => setBoard({ ...board!, title: text })}
-          style={styles.input}
-          returnKeyType="done"
-          enterKeyHint="done"
-          onEndEditing={onUpdateBoard}
-        />
+        <View>
+          <Text style={styles.label}>Board name</Text>
+          <TextInput
+            value={board?.title}
+            onChangeText={text => setBoard({ ...board!, title: text })}
+            style={styles.input}
+            returnKeyType="done"
+            enterKeyHint="done"
+            onEndEditing={onUpdateBoard}
+          />
+        </View>
       </View>
       <View style={styles.container}>
         <View style={{ flexDirection: 'row', gap: 14 }}>
@@ -80,25 +84,19 @@ const Page = () => {
 
         <Link href={`/(authenticated)/board/invite?id=${id}`} asChild>
           <TouchableOpacity style={styles.fullBtn}>
-            <Text
-              style={{
-                color: Colors.fontLight,
-                fontSize: 16,
-              }}
-            >
-              Manage board members
+            <Text style={{ fontSize: 16, color: Colors.fontLight }}>
+              Invite...
             </Text>
           </TouchableOpacity>
         </Link>
       </View>
+
       <TouchableOpacity onPress={onDelete} style={styles.deleteBtn}>
-        <Text>Close board</Text>
+        <Text>Close Board</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-export default Page;
 
 const styles = StyleSheet.create({
   container: {
@@ -133,3 +131,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default Page;

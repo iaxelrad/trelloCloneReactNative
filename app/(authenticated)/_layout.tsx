@@ -6,26 +6,20 @@ import { TouchableOpacity } from 'react-native';
 
 const Layout = () => {
   const router = useRouter();
+
   return (
     <Stack>
-      <Stack.Screen name={'(tabs)'} options={{ headerShown: false }} />
       <Stack.Screen
-        name={'board/settings'}
+        name="(tabs)"
         options={{
-          presentation: 'modal',
-          title: 'Board Menu',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="close" size={18} color={'#716E75'} />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }}
       />
       <Stack.Screen
-        name={'board/invite'}
+        name="board/settings"
         options={{
           presentation: 'modal',
-          title: 'Manage Board Members',
+          title: 'Board Menu',
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.back()}
@@ -41,7 +35,26 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
-        name={'board/card/[id]'}
+        name="board/invite"
+        options={{
+          presentation: 'modal',
+          title: 'Manage board members',
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{
+                backgroundColor: '#E3DFE9',
+                borderRadius: 16,
+                padding: 6,
+              }}
+            >
+              <Ionicons name="close" size={18} color={'#716E75'} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="board/card/[id]"
         options={{
           presentation: 'containedModal',
           title: '',

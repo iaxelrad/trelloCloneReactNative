@@ -31,9 +31,7 @@ import UserListItem from '@/components/UserListItem';
 const Page = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['90%'], []);
-
-  const router = useRouter();
+  const snapPoints = useMemo(() => ['60%'], []);
 
   const {
     getCardInfo,
@@ -42,9 +40,11 @@ const Page = () => {
     updateCard,
     assignCard,
   } = useSupabase();
+
+  const router = useRouter();
   const [card, setCard] = useState<Task>();
   const [member, setMember] = useState<User[]>([]);
-  const [imagePath, setImagePath] = useState<string>();
+  const [imagePath, setImagePath] = useState<string>('');
 
   if (card?.image_url) {
     getFileFromPath!(card.image_url).then(path => {
@@ -60,12 +60,12 @@ const Page = () => {
   }, [id]);
 
   const loadInfo = async () => {
-    const data = await getCardInfo!(id!);
-    console.log(data);
+    if (!id) return;
+
+    const data = await getCardInfo!(id);
     setCard(data);
 
-    const member = await getBoardMember!(data.board_id!);
-    console.log(member);
+    const member = await getBoardMember!(data.board_id);
     setMember(member);
   };
 
@@ -78,9 +78,10 @@ const Page = () => {
     updateCard!({ ...card!, done: true });
     router.back();
   };
+
   const onAssignUser = async (user: User) => {
     const { data } = await assignCard!(card!.id, user.id);
-    console.log(data);
+
     setCard(data);
     bottomSheetModalRef.current?.close();
   };
@@ -88,7 +89,7 @@ const Page = () => {
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
-        {...props}
+        opacity={0.2}
         disappearsOnIndex={-1}
         appearsOnIndex={0}
         {...props}
@@ -117,6 +118,7 @@ const Page = () => {
                 value={card.title}
                 onChangeText={text => setCard({ ...card, title: text })}
                 style={styles.input}
+                multiline
               />
             )}
 
@@ -125,10 +127,15 @@ const Page = () => {
               multiline
               onChangeText={text => setCard({ ...card, description: text })}
               style={[styles.input, { minHeight: 100 }]}
+              placeholder="Add a description"
             />
 
             {imagePath && (
-              <Image source={{ uri: imagePath }} style={styles.image} />
+              <>
+                {card.image_url && (
+                  <Image source={{ uri: imagePath }} style={styles.image} />
+                )}
+              </>
             )}
 
             <View style={styles.memberContainer}>
@@ -178,15 +185,20 @@ const Page = () => {
               onPress={() => bottomSheetModalRef.current?.close()}
             />
           </View>
-          <View style={{ backgroundColor: '#fff', padding: 10 }}>
+          <View
+            style={{
+              backgroundColor: '#fff',
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+            }}
+          >
             <FlatList
               data={member}
+              keyExtractor={item => item.id}
               renderItem={item => (
                 <UserListItem element={item} onPress={onAssignUser} />
               )}
-              contentContainerStyle={{
-                gap: 8,
-              }}
+              contentContainerStyle={{ gap: 8 }}
             />
           </View>
         </View>
@@ -194,8 +206,6 @@ const Page = () => {
     </BottomSheetModalProvider>
   );
 };
-
-export default Page;
 
 const styles = StyleSheet.create({
   input: {
@@ -214,10 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     padding: 8,
-    marginVertical: 14,
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 4,
   },
   btn: {
     padding: 10,
@@ -235,3 +242,5 @@ const styles = StyleSheet.create({
     gap: 16,
   },
 });
+
+export default Page;

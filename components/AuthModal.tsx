@@ -32,6 +32,7 @@ const LOGIN_OPTIONS = [
 interface AuthModalProps {
   authType: ModalType | null;
 }
+
 const AuthModal = ({ authType }: AuthModalProps) => {
   useWarmUpBrowser();
   const { signUp, setActive } = useSignUp();
@@ -49,9 +50,8 @@ const AuthModal = ({ authType }: AuthModalProps) => {
     strategy: AuthStrategy.Apple,
   });
 
-  const onSelectedAuth = async (strategy: AuthStrategy) => {
-    // Implement OAuth flow using Clerk's OAuth API
-    if (!signIn || !signUp) return;
+  const onSelectAuth = async (strategy: AuthStrategy) => {
+    if (!signIn || !signUp) return null;
 
     const selectedAuth = {
       [AuthStrategy.Google]: googleAuth,
@@ -60,6 +60,7 @@ const AuthModal = ({ authType }: AuthModalProps) => {
       [AuthStrategy.Apple]: appleAuth,
     }[strategy];
 
+    // https://clerk.com/docs/custom-flows/oauth-connections#o-auth-account-transfer-flows
     // If the user has an account in your application, but does not yet
     // have an OAuth account connected to it, you can transfer the OAuth
     // account to the existing user account.
@@ -76,21 +77,8 @@ const AuthModal = ({ authType }: AuthModalProps) => {
           session: res.createdSessionId,
         });
       }
-
-      try {
-        const { createdSessionId, setActive } = await selectedAuth();
-
-        if (createdSessionId) {
-          setActive!({ session: createdSessionId });
-        }
-      } catch (error) {
-        console.error(error);
-      }
     }
 
-    // If the user has an OAuth account but does not yet
-    // have an account in your app, you can create an account
-    // for them using the OAuth information.
     const userNeedsToBeCreated =
       signIn.firstFactorVerification.status === 'transferable';
 
@@ -107,33 +95,32 @@ const AuthModal = ({ authType }: AuthModalProps) => {
     } else {
       // If the user has an account in your application
       // and has an OAuth account connected to it, you can sign them in.
-
       try {
         const { createdSessionId, setActive } = await selectedAuth();
 
         if (createdSessionId) {
           setActive!({ session: createdSessionId });
-          console.log('Session created');
+          console.log('OAuth success standard');
         }
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error('OAuth error', err);
       }
     }
   };
 
   return (
-    <BottomSheetView style={styles.modalContainer}>
+    <BottomSheetView style={[styles.modalContainer]}>
       <TouchableOpacity style={styles.modalBtn}>
         <Ionicons name="mail-outline" size={20} />
         <Text style={styles.btnText}>
-          {authType === ModalType.Login ? 'Log in ' : 'Sign in'} with Email
+          {authType === ModalType.Login ? 'Log in' : 'Sign up'} with Email
         </Text>
       </TouchableOpacity>
-      {LOGIN_OPTIONS.map(option => (
+      {LOGIN_OPTIONS.map((option, index) => (
         <TouchableOpacity
-          key={option.strategy}
+          key={index}
           style={styles.modalBtn}
-          onPress={() => onSelectedAuth(option.strategy)}
+          onPress={() => onSelectAuth(option.strategy!)}
         >
           <Image source={option.icon} style={styles.btnIcon} />
           <Text style={styles.btnText}>{option.text}</Text>
@@ -154,14 +141,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 14,
     alignItems: 'center',
-  },
-  btnText: {
-    fontSize: 18,
+    borderColor: '#fff',
+    borderWidth: 1,
   },
   btnIcon: {
     width: 20,
     height: 20,
     resizeMode: 'contain',
+  },
+  btnText: {
+    fontSize: 18,
   },
 });
 

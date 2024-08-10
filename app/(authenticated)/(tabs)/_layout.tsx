@@ -1,11 +1,7 @@
-import { View, Text, Image } from 'react-native';
-import React from 'react';
+import { Image } from 'react-native';
 import { Tabs } from 'expo-router';
-import {
-  FontAwesome,
-  Ionicons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Colors } from '@/constants/Colors';
 
 const Layout = () => {

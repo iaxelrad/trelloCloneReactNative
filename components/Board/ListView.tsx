@@ -4,6 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Image,
   View,
 } from 'react-native';
 import React, {
@@ -55,7 +56,7 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [taskList.id]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['40%'], []);
@@ -78,50 +79,48 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
 
     if (!record) return;
 
-    switch (event) {
-      case 'INSERT':
-        setTasks(prev => {
-          return [...prev, record];
-        });
-        break;
-      case 'UPDATE':
-        setTasks(prev => {
-          return prev
-            .map(task => {
-              if (task.id === record.id) {
-                return record;
-              }
-              return task;
-            })
-            .filter(task => !task.done)
-            .sort((a, b) => a.position - b.position);
-        });
-        break;
-      case 'DELETE':
-        setTasks(prev => {
-          return prev.filter(task => task.id !== record.id);
-        });
-        break;
-      default:
-        console.log('Unhandled event type: ', event);
-        break;
+    if (event === 'INSERT') {
+      setTasks(prev => {
+        return [...prev, record];
+      });
+    } else if (event === 'UPDATE') {
+      setTasks(prev => {
+        return prev
+          .map(task => {
+            if (task.id === record.id) {
+              return record;
+            }
+            return task;
+          })
+          .filter(task => !task.done)
+          .sort((a, b) => a.position - b.position);
+      });
+    } else if (event === 'DELETE') {
+      setTasks(prev => {
+        return prev.filter(task => task.id !== record.id);
+      });
+    } else {
+      console.log('Unhandled event', event);
     }
   };
 
   const loadListTasks = async () => {
-    const cards = await getListCards!(taskList.id);
-    setTasks(cards);
+    const data = await getListCards!(taskList.id);
+    setTasks(data);
   };
 
   const onAddCard = async () => {
-    const { data } = await addListCard!(
+    const { data, error } = await addListCard!(
       taskList.id,
       taskList.board_id,
       newTask,
       tasks.length
     );
-    setIsAdding(false);
-    setNewTask('');
+    if (!error) {
+      setIsAdding(false);
+      setNewTask('');
+    }
+    // Unnecessary when using realtime updates
     // setTasks([...tasks, data]);
   };
 
@@ -137,10 +136,10 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
     ),
     []
   );
-
   const onUpdateTaskList = async () => {
-    await updateBoardList!(taskList, listName);
+    const updated = await updateBoardList!(taskList, listName);
   };
+
   const onDeleteList = async () => {
     await deleteBoardList!(taskList.id);
     bottomSheetModalRef.current?.close();
@@ -148,16 +147,11 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
   };
 
   const onTaskDropped = async (params: DragEndParams<Task>) => {
-    console.log('onTaskDropped', params);
-    const newData = params.data.map((item, index) => {
-      return {
-        ...item,
-        position: index,
-      };
+    const newData = params.data.map((item: any, index: number) => {
+      return { ...item, position: index };
     });
     setTasks(newData);
-
-    newData.forEach(async item => {
+    newData.forEach(async (item: any) => {
       await updateCard!(item);
     });
   };
@@ -183,7 +177,7 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
       const storagePath = await uploadFile!(filePath, base64, contentType);
 
       if (storagePath) {
-        addListCard!(
+        await addListCard!(
           taskList.id,
           taskList.board_id,
           fileName,
@@ -227,16 +221,16 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
             onPlaceholderIndexChange={() =>
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
             }
+            activationDistance={10}
           />
-
-          {isAdding ? (
+          {isAdding && (
             <TextInput
               autoFocus
               style={styles.input}
               value={newTask}
               onChangeText={setNewTask}
             />
-          ) : null}
+          )}
 
           <View
             style={{
@@ -255,10 +249,7 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
                   <Ionicons name="add" size={14} />
                   <Text style={{ fontSize: 12 }}>Add card</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={{ flexDirection: 'row', alignItems: 'center' }}
-                  onPress={onSelectImage}
-                >
+                <TouchableOpacity onPress={onSelectImage}>
                   <Ionicons name="image-outline" size={18} />
                 </TouchableOpacity>
               </>
@@ -295,7 +286,13 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
         enableOverDrag={false}
       >
         <View style={styles.container}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 10,
+            }}
+          >
             <Button
               title="Cancel"
               onPress={() => bottomSheetModalRef.current?.close()}
@@ -321,7 +318,7 @@ const ListView = ({ taskList, onDelete }: ListViewProps) => {
             />
           </View>
           <TouchableOpacity onPress={onDeleteList} style={styles.deleteBtn}>
-            <Text>Close list</Text>
+            <Text>Close List</Text>
           </TouchableOpacity>
         </View>
       </BottomSheetModal>
@@ -362,7 +359,7 @@ const styles = StyleSheet.create({
   deleteBtn: {
     backgroundColor: '#fff',
     padding: 8,
-    paddingHorizontal: 16,
+    marginHorizontal: 16,
     borderRadius: 6,
     alignItems: 'center',
   },

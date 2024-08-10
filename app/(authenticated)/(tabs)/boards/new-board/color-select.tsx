@@ -1,9 +1,9 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 
-export const COLORS = [
+const COLORS = [
   '#0079bf',
   '#d29034',
   '#519839',
@@ -18,13 +18,14 @@ export const COLORS = [
 export const DEFAULT_COLOR = COLORS[0];
 
 const Page = () => {
-  const [selected, setSelected] = useState(DEFAULT_COLOR);
+  const [selected, setSelected] = useState<string>(DEFAULT_COLOR);
   const router = useRouter();
 
   const onColorSelect = (color: string) => {
     setSelected(color);
     router.setParams({ bg: color });
   };
+
   return (
     <View style={styles.container}>
       {COLORS.map(color => (
@@ -35,7 +36,7 @@ const Page = () => {
             { backgroundColor: color, borderWidth: selected === color ? 2 : 0 },
           ]}
           onPress={() => onColorSelect(color)}
-        ></TouchableOpacity>
+        />
       ))}
     </View>
   );
@@ -44,6 +45,7 @@ const Page = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    flexGrow: 1,
     flexWrap: 'wrap',
     justifyContent: 'center',
   },

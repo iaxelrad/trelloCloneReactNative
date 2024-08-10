@@ -1,17 +1,12 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
 import { useAuth } from '@clerk/clerk-expo';
-
+import { View, Button } from 'react-native';
 const Page = () => {
   const { signOut } = useAuth();
 
   return (
     <View>
-      <Button title="Sign Out" onPress={() => signOut()} />
+      <Button title="Sign out" onPress={() => signOut()} />
     </View>
   );
 };
-
 export default Page;
-
-const styles = StyleSheet.create({});

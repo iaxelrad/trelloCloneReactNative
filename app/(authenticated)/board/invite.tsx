@@ -1,15 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import { View, FlatList } from 'react-native';
+import { useState } from 'react';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useSupabase } from '@/context/SupabaseContext';
 import { User } from '@/types/enums';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { DefaultTheme } from '@react-navigation/native';
-import { FlatList } from 'react-native-gesture-handler';
 import UserListItem from '@/components/UserListItem';
 
 const Page = () => {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id?: string }>();
   const { findUsers, addUserToBoard } = useSupabase();
   const router = useRouter();
   const [search, setSearch] = useState('');
@@ -17,13 +16,13 @@ const Page = () => {
   const headerHeight = useHeaderHeight();
 
   const onSearchUser = async () => {
-    const users = await findUsers!(search);
-    setUserList(users);
+    const data = await findUsers!(search);
+    setUserList(data);
   };
 
   const onAddUser = async (user: User) => {
     await addUserToBoard!(id!, user.id);
-    router.back();
+    router.dismiss();
   };
 
   return (
@@ -36,6 +35,7 @@ const Page = () => {
           },
           headerSearchBarOptions: {
             inputType: 'email',
+            autoCapitalize: 'none',
             placeholder: 'Invite by name, username or email',
             autoFocus: true,
             cancelButtonText: 'Done',
@@ -54,7 +54,5 @@ const Page = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default Page;

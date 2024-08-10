@@ -23,7 +23,7 @@ const tokenCache = {
   },
   async saveToken(key: string, value: string) {
     try {
-      await SecureStore.setItemAsync(key, value);
+      return SecureStore.setItemAsync(key, value);
     } catch (err) {
       return;
     }
@@ -69,7 +69,7 @@ const RootLayoutNav = () => {
   return (
     <ClerkProvider
       tokenCache={tokenCache}
-      publishableKey={CLERK_PUBLISHABLE_KEY}
+      publishableKey={CLERK_PUBLISHABLE_KEY!}
     >
       <ActionSheetProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>

@@ -30,22 +30,25 @@ const BoardArea = ({ board }: BoardAreaProps) => {
     { id: undefined },
   ]);
   const [startListActive, setStartListActive] = useState(false);
-  const progress = useSharedValue(0);
+  const progress = useSharedValue<number>(0);
+  const scrollOffsetValue = useSharedValue<number>(0);
 
   useEffect(() => {
-    if (!board) return;
     loadBoardLists();
-  }, [board]);
+  }, []);
 
   const loadBoardLists = async () => {
-    const lists = await getBoardLists!(board!.id);
+    if (!board) return;
+    const lists = await getBoardLists!(board.id);
+    // Add our fake item to the end of the list
     setData([...lists, { id: undefined }]);
   };
 
-  const onSaveNewList = async (title: string) => {
+  const onSaveNewList = async (title: any) => {
     setStartListActive(false);
     const { data: newItem } = await addBoardList!(board!.id, title);
     data.pop();
+    // Add our fake item to the end of the list
     setData([...data, newItem, { id: undefined }]);
   };
 
@@ -67,6 +70,7 @@ const BoardArea = ({ board }: BoardAreaProps) => {
         ref={ref}
         pagingEnabled
         onProgressChange={progress}
+        defaultScrollOffsetValue={scrollOffsetValue}
         renderItem={({ item, index }: any) => (
           <>
             {item.id && (
@@ -92,7 +96,7 @@ const BoardArea = ({ board }: BoardAreaProps) => {
                     onPress={() => setStartListActive(true)}
                   >
                     <Text style={{ color: Colors.fontLight, fontSize: 18 }}>
-                      Add List
+                      Add list
                     </Text>
                   </TouchableOpacity>
                 )}
